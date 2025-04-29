@@ -1,5 +1,11 @@
+import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
+import { handleUserSignUp } from "./src/controllers/user.controller.js";
+import {addStore} from "./src/controllers/store.controller.js";
+import {addReview} from "./src/controllers/review.controller.js";
+import {addStoreMission} from "./src/controllers/mission.controller.js";
+import {challengeStoreMission} from "./src/controllers/mission.controller.js";
 
 dotenv.config();
 
@@ -14,6 +20,16 @@ app.use(express.urlencoded({ extended: false })); // 단순 객체 문자열 형
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
+
+app.post("/api/v1/users/signup", handleUserSignUp);
+// 특정 지역에 가게 추가하기
+app.post("/api/v1/stores/register/:regionId", addStore);
+// 가게에 리뷰 추가하기
+app.post("/api/v1/reviews/stores/:storeId", addReview);
+// 가게에 미션 추가하기
+app.post("/api/v1/missions/stores/:storeId", addStoreMission);
+// 가게의 미션을 도전 중인 미션에 추가하기
+app.post("/api/v1/missions/:missionId/challenges", challengeStoreMission);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
