@@ -2,6 +2,8 @@
 import {
     addMission as addMissionRepo,
     challengeMission as challengeMissionRepo,
+    showStoreMission as showStoreMissionRepo,
+    showUserMission as showUserMissionRepo
   } from "../repositories/mission.repository.js";
 
 export const addMission = async (data) => {
@@ -31,3 +33,13 @@ export const challengeMission = async (data) => {
   
     return { challengeId };
   };
+
+export const showStoreMission = async (storeId) => {
+    if (!storeId) throw new Error("storeId가 필요합니다.");
+    return await showStoreMissionRepo(storeId);
+};
+  
+export const showUserMission = async (userId) => {
+    if (!userId) throw new Error("userId가 필요합니다.");
+    return await showUserMissionRepo(userId);
+};

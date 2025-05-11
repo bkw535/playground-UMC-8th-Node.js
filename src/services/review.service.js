@@ -1,6 +1,7 @@
 // import { responseFromReview } from "../dtos/review.dto.js";
 import {
     addReview as addReviewRepo,
+    showUserReview as showUserReviewRepo,
   } from "../repositories/review.repository.js";
 
   export const addReview = async (data) => {
@@ -15,4 +16,13 @@ import {
 
 export const addPhotoReview = async (data) => {
     // 작성 내용
+  };
+
+  export const showUserReview = async (userId) => {
+    if (!userId) {
+      throw new Error("userId가 필요합니다.");
+    }
+  
+    const reviews = await showUserReviewRepo(userId);
+    return reviews;
   };

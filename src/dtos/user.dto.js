@@ -12,3 +12,18 @@ export const bodyToUser = (body) => {
       preferences: body.preferences,
     };
   };
+
+  export const responseFromUser = ({ user, preferences }) => {
+    return {
+      id: Number(user.id),
+      name: user.name,
+      email: user.email,
+      gender: user.gender,
+      birth: user.birth,
+      address: user.address,
+      preferences: preferences.map((pref) => ({
+        id: Number(pref.foodCategory.id),
+        type: pref.foodCategory.type,
+      })),
+    };
+  };

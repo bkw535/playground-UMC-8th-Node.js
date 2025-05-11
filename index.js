@@ -4,7 +4,10 @@ import express from "express";
 import { handleUserSignUp } from "./src/controllers/user.controller.js";
 import {addStore} from "./src/controllers/store.controller.js";
 import {addReview} from "./src/controllers/review.controller.js";
+import {showUserReview} from "./src/controllers/review.controller.js";
 import {addStoreMission} from "./src/controllers/mission.controller.js";
+import {showUserMission} from "./src/controllers/mission.controller.js";
+import {showStoreMission} from "./src/controllers/mission.controller.js";
 import {challengeStoreMission} from "./src/controllers/mission.controller.js";
 
 dotenv.config();
@@ -21,6 +24,7 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
+// 회원가입
 app.post("/api/v1/users/signup", handleUserSignUp);
 // 특정 지역에 가게 추가하기
 app.post("/api/v1/stores/register/:regionId", addStore);
@@ -30,6 +34,12 @@ app.post("/api/v1/reviews/stores/:storeId", addReview);
 app.post("/api/v1/missions/stores/:storeId", addStoreMission);
 // 가게의 미션을 도전 중인 미션에 추가하기
 app.post("/api/v1/missions/:missionId/challenges", challengeStoreMission);
+// 내가 작성한 리뷰 목록
+app.get("/api/v1/reviews/users/:userId", showUserReview);
+// 특정 가게의 미션 목록
+app.get("/api/v1/missions/stores/:storeId", showStoreMission);
+// 내가 진행 중인 미션 목록
+app.get("/api/v1/missions/users/:userId", showUserMission);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);

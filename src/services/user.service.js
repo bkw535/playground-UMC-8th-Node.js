@@ -1,4 +1,4 @@
-// import { responseFromUser } from "../dtos/user.dto.js";
+import { responseFromUser } from "../dtos/user.dto.js";
 import {
   addUser,
   getUser,
@@ -13,8 +13,6 @@ export const userSignUp = async (data) => {
     gender: data.gender,
     birth: data.birth,
     address: data.address,
-    detailAddress: data.detailAddress,
-    phoneNumber: data.phoneNumber,
   });
 
   if (joinUserId === null) {

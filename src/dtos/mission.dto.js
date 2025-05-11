@@ -14,6 +14,6 @@ export const bodyToChallengeMission = (body, missionId) => {
 
     return {
         missionId: parseInt(missionId, 10),
-        userId: body.userId
+        userId: Number(body.userId)
     };
 };
