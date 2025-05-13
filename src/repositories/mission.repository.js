@@ -10,7 +10,7 @@ export const addMission = async (data) => {
       });
 
       if (!store) {
-        throw new Error("존재하지 않는 가게입니다.");
+        throw new StoreIdNotFoundError("존재하지 않는 가게입니다.", { storeId: data.storeId });
       }
 
       // 미션 생성
@@ -39,7 +39,8 @@ export const addMission = async (data) => {
 
     return result;
   } catch (err) {
-    throw new Error(`미션 추가 실패: ${err.message}`);
+    if (err instanceof StoreIdNotFoundError) throw err;
+    throw new MissionTransactionError("미션 추가 실패", { originalError: err });
   }
 };
 
@@ -53,7 +54,7 @@ export const challengeMission = async ({ userId, missionId }) => {
       });
 
       if (!user) {
-        throw new Error("존재하지 않는 사용자입니다.");
+        throw new UserIdNotFoundError("존재하지 않는 사용자입니다.", { userId });
       }
 
       // 미션 존재 및 상태 확인
@@ -63,11 +64,14 @@ export const challengeMission = async ({ userId, missionId }) => {
       });
 
       if (!mission) {
-        throw new Error("존재하지 않는 미션입니다.");
+        throw new MissionIdNotFoundError("존재하지 않는 미션입니다.", { missionId });
       }
 
       if (mission.status !== "대기 중") {
-        throw new Error("이미 도전 중이거나 완료된 미션입니다.");
+        throw new MissionStatusInvalidError("이미 도전 중이거나 완료된 미션입니다.", {
+          missionId,
+          status: mission.status,
+        });
       }
 
       // 미션 상태 업데이트
@@ -84,7 +88,18 @@ export const challengeMission = async ({ userId, missionId }) => {
 
     return result;
   } catch (err) {
-    throw new Error(`미션 도전 실패: ${err.message}`);
+    if (
+      err instanceof UserIdNotFoundError ||
+      err instanceof MissionIdNotFoundError ||
+      err instanceof MissionStatusInvalidError
+    ) {
+      throw err;
+    }
+    throw new MissionTransactionError("미션 도전 실패", {
+      missionId,
+      userId,
+      originalError: err,
+    });
   }
 };
 

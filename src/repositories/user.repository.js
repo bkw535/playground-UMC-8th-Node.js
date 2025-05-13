@@ -4,7 +4,7 @@ import { prisma } from "../db.config.js";
 export const addUser = async (data) => {
   const user = await prisma.user.findFirst({ where: { email: data.email } });
   if (user) {
-    return null;
+    throw new DuplicateUserEmailError("이미 존재하는 이메일입니다.", { email: data.email });
   }
 
   const created = await prisma.user.create({ data: data });
@@ -13,23 +13,17 @@ export const addUser = async (data) => {
 
 // 사용자 정보 얻기
 export const getUser = async (userId) => {
-  try {
-    const user = await prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-    });
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+  });
 
-    if (!user) {
-      return null;
-    }
-
-    return user;
-  } catch (err) {
-    throw new Error(
-      `오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err})`
-    );
+  if (!user) {
+    throw new UserNotFoundError("사용자를 찾을 수 없습니다.", { userId });
   }
+
+  return user;
 };
 
 // 음식 선호 카테고리 매핑
@@ -37,16 +31,16 @@ export const setPreference = async (userId, foodCategoryId) => {
   try {
     await prisma.foodType.create({
       data: {
-        userId: userId,
-        foodCategoryId: foodCategoryId,
+        userId,
+        foodCategoryId,
       },
     });
-
-    return;
   } catch (err) {
-    throw new Error(
-      `오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err})`
-    );
+    throw new PreferenceSaveError("선호 카테고리 저장에 실패했습니다.", {
+      userId,
+      foodCategoryId,
+      originalError: err,
+    });
   }
 };
 
@@ -54,9 +48,7 @@ export const setPreference = async (userId, foodCategoryId) => {
 export const getUserPreferencesByUserId = async (userId) => {
   try {
     const preferences = await prisma.foodType.findMany({
-      where: {
-        userId: userId,
-      },
+      where: { userId },
       include: {
         foodCategory: {
           select: {
@@ -66,14 +58,15 @@ export const getUserPreferencesByUserId = async (userId) => {
         },
       },
       orderBy: {
-        foodCategoryId: 'asc',
+        foodCategoryId: "asc",
       },
     });
 
     return preferences;
   } catch (err) {
-    throw new Error(
-      `오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err})`
-    );
+    throw new PreferenceFetchError("선호 카테고리 조회 중 오류가 발생했습니다.", {
+      userId,
+      originalError: err,
+    });
   }
 };

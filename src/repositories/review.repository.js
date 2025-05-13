@@ -20,7 +20,7 @@ export const addReview = async (data) => {
 
     return review;
   } catch (err) {
-    throw new Error(`리뷰 등록 실패: ${err.message}`);
+    throw new ReviewTransactionError("리뷰 등록 실패", { originalError: err });
   }
 };
 
@@ -42,6 +42,9 @@ export const showUserReview = async (userId) => {
 
     return reviews;
   } catch (err) {
-    throw new Error(`리뷰 조회 실패: ${err.message}`);
+    throw new ReviewTransactionError("리뷰 조회 실패", {
+      userId,
+      originalError: err,
+    });
   }
 };

@@ -5,6 +5,8 @@ node_modules/
 .env
 .env.*
 
+.vscode/
+
 # prisma
 prisma/dev.db
 .prisma

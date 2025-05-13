@@ -8,7 +8,7 @@ import {
     const reviewId = await addReviewRepo(data);
   
     if (!reviewId) {
-      throw new Error("리뷰 등록에 실패했습니다.");
+      throw new ReviewIdNotFoundError("reviewId가 없습니다.", data);
     }
   
     return { reviewId };
@@ -20,7 +20,7 @@ export const addPhotoReview = async (data) => {
 
   export const showUserReview = async (userId) => {
     if (!userId) {
-      throw new Error("userId가 필요합니다.");
+      throw new UserIdNotFoundError("userId가 없습니다.", data);
     }
   
     const reviews = await showUserReviewRepo(userId);

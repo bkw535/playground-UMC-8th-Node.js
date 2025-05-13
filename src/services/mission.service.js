@@ -15,7 +15,7 @@ export const addMission = async (data) => {
   });
 
   if (!missionId) {
-    throw new Error("미션 추가에 실패했습니다.");
+    throw new MissionIdNotFoundError("missionId가 없습니다.", data);
   }
 
   return { missionId };
@@ -28,18 +28,20 @@ export const challengeMission = async (data) => {
     });
   
     if (!challengeId) {
-      throw new Error("미션 도전 등록에 실패했습니다.");
+      throw new ChallengeIdNotFoundError("challengeId가 없습니다.", data);
     }
   
     return { challengeId };
   };
 
 export const showStoreMission = async (storeId) => {
-    if (!storeId) throw new Error("storeId가 필요합니다.");
+    if (!storeId) throw new StoreIdNotFoundError("storeId가 없습니다.", data);
     return await showStoreMissionRepo(storeId);
 };
   
 export const showUserMission = async (userId) => {
-    if (!userId) throw new Error("userId가 필요합니다.");
+    if (!userId) {
+      throw new UserIdNotFoundError("userId가 없습니다.", data);
+    }
     return await showUserMissionRepo(userId);
 };
