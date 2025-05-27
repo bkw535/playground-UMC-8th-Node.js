@@ -1,19 +1,52 @@
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
-import { handleUserSignUp } from "./src/controllers/user.controller.js";
-import {addStore} from "./src/controllers/store.controller.js";
-import {addReview} from "./src/controllers/review.controller.js";
-import {showUserReview} from "./src/controllers/review.controller.js";
-import {addStoreMission} from "./src/controllers/mission.controller.js";
-import {showUserMission} from "./src/controllers/mission.controller.js";
-import {showStoreMission} from "./src/controllers/mission.controller.js";
-import {challengeStoreMission} from "./src/controllers/mission.controller.js";
+import swaggerAutogen from "swagger-autogen";
+import swaggerUiExpress from "swagger-ui-express";
+import userRoutes from "./src/routes/user.routes.js";
+import missionRoutes from "./src/routes/mission.routes.js";
+import reviewRoutes from "./src/routes/review.routes.js";
+
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT;
+
+app.use(
+  "/docs",
+  swaggerUiExpress.serve,
+  swaggerUiExpress.setup({}, {
+    swaggerOptions: {
+      url: "/openapi.json",
+    },
+  })
+);
+
+app.get("/openapi.json", async (req, res, next) => {
+  // #swagger.ignore = true
+  const options = {
+    openapi: "3.0.0",
+    disableLogs: true,
+    writeOutputFile: false,
+  };
+  const outputFile = "/dev/null"; // 파일 출력은 사용하지 않습니다.
+  const routes = ["./index.js",
+    "./src/routes/user.routes.js",
+  "./src/routes/review.routes.js",
+  "./src/routes/mission.routes.js",
+  ];
+  const doc = {
+    info: {
+      title: "UMC 8th",
+      description: "UMC 8th Node.js 테스트 프로젝트입니다.",
+    },
+    host: "localhost:3000",
+  };
+
+  const result = await swaggerAutogen(options)(outputFile, routes, doc);
+  res.json(result ? result.data : null);
+});
 
 /**
  * 공통 응답을 사용할 수 있는 헬퍼 함수 등록
@@ -43,22 +76,9 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-// 회원가입
-app.post("/api/v1/users/signup", handleUserSignUp);
-// 특정 지역에 가게 추가하기
-app.post("/api/v1/stores/register/:regionId", addStore);
-// 가게에 리뷰 추가하기
-app.post("/api/v1/reviews/stores/:storeId", addReview);
-// 가게에 미션 추가하기
-app.post("/api/v1/missions/stores/:storeId", addStoreMission);
-// 가게의 미션을 도전 중인 미션에 추가하기
-app.post("/api/v1/missions/:missionId/challenges", challengeStoreMission);
-// 내가 작성한 리뷰 목록
-app.get("/api/v1/reviews/users/:userId", showUserReview);
-// 특정 가게의 미션 목록
-app.get("/api/v1/missions/stores/:storeId", showStoreMission);
-// 내가 진행 중인 미션 목록
-app.get("/api/v1/missions/users/:userId", showUserMission);
+app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/missions", missionRoutes);
+app.use("/api/v1/reviews", reviewRoutes);
 
 /**
  * 전역 오류를 처리하기 위한 미들웨어
